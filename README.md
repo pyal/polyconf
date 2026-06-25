@@ -1,16 +1,25 @@
 # polyconf
 
-Polyconf is a Scala framework for building **config-driven, polymorphic applications** —
-programs where the concrete implementation of every component is determined at runtime
-from a JSON or YAML configuration string. Instead of hardcoding class instantiation,
-you declare abstract base traits, register all concrete subclasses, and let the config
-choose which one to use.
+**YAML-based development for Scala.**
+
+Polyconf enables a development model where building a new program means writing a
+YAML config which defines specific interaction of existing classes to solve given problem.
 
 A single YAML file defines a complex job. That same YAML can be executed in every
 environment — local dev, verification, staging, production — and in every execution
 mode — direct shell command, Spark cluster, workflow orchestrator — with environment-
 specific parameters injected via command-line variables. No environment-specific
 configs, no copy-paste, no manual edits per deployment.
+
+Areas where Polyconf really shines: solving complex scientific and experimental
+tasks with optimization, building complex filters, pipelines, and workflows —
+where a single executable can be used to solve all possible problems with different
+configs.
+
+The core mechanism is **polymorphic class dispatch**: the concrete implementation of
+every component is determined at runtime from a JSON or YAML configuration string.
+Instead of hardcoding class instantiation, you declare abstract base traits, register
+all concrete subclasses, and let the config choose which one to use.
 
 ## Core idea: `PolyConf`
 
