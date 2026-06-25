@@ -1,0 +1,65 @@
+# Code Review Findings
+
+Status: ✅ Done / ❌ Open / ⏭ Skipped
+
+## Bugs / Will Fail
+
+1. **`build.sbt:41`** — `assembly / mainClass` — ✅ **False positive**. Was already `org.polyconf.argfmt.ArgFormatter` (correct).
+
+2. **`CustomAccumulators.remove`** — ✅ **File removed** per review.
+
+3. **`ParallelOps.parallelRun`** — ✅ **Fixed**. Now processes all inputs, collects failures, throws first at end.
+
+## Dead / Unused Code
+
+4. **`PolySerde.any2ConfNode`** — ✅ **Kept by request** — user wanted it restored after removal.
+
+5. **`PolySerde.javaSerialize` / `javaDeserialize`** — ❌ Used only in one `SerdeSpec` test.
+
+6. **`log4j.properties`** — ✅ **Removed** (log4j 1.x format, ignored by log4j 2.x).
+
+7. **`ArgFormatterSpec.ArgFormatStub`** — ❌ Abstract class registered only to test `registerBase`. Could use existing `EscapeFormatBase`.
+
+8. **`ParallelOps` import `scala.language.reflectiveCalls`** — ✅ **False positive**. Needed for structural type access on anonymous `AutoCloseable` with `threadPool` member.
+
+9. **`CustomAccumulators`** — ✅ **File removed** (thin delegation wrapper, adds no value).
+
+## Inconsistencies
+
+10. **`DESCRIPTION.md`** — ✅ **Updated** to reflect current codebase.
+
+11. **`RunnerStream.help`** — ✅ **False positive**. Style (`"""` + newline + `|` + `stripMargin`) is consistent with all other help strings.
+
+12. **`TransformerData.mapData`** — ✅ **Fixed**. Removed no-op `fold`, now `copy(data = data.map(f))`.
+
+13. **`CliRunParamsGenerator.toArgs`** — ✅ **Fixed**. `f"..."` → `s"..."`.
+
+14. **`@transient lazy val Log` vs `private lazy val Log`** — ⏭ **Skipped** — cosmetic only.
+
+15. **`final case class` vs `case class`** — ✅ **Fixed**. All case classes are now `final`.
+
+## Design Concerns
+
+16. **`PolyConf.addDeserializer`** creates new `ObjectMapper.copy()` on every `deserialize` — ⏭ **Skipped** — `ObjectMapper.copy()` is cheap.
+
+17. **`PolySerde.jsonRecursiveMapper`** is a `def` — ❌ Creates new `ObjectMapper` + module each access.
+
+18. **`FileSource` trait with concrete `val` defaults** — ❌ `val path: String = ""` silently masks missing config.
+
+19. **`SimpleDataGenerator` / `SimpleDataWriter` / `VerifyDataWriter` case classes with empty constructors** — ❌ Jackson sets fields via FIELD access, but `equals`/`hashCode` ignore data fields.
+
+20. **`RunnerStream` is a case class with mutable pipeline** — ❌ Case classes should be immutable.
+
+## Documentation Drift
+
+21. **`DESCRIPTION.md` Non-goals** — ✅ **Fixed** — no longer mentions those dependencies.
+
+22. **No comment on log4j-1.2-api bridge** — ❌ `build.sbt:18` — included but undocumented. Needed for Hadoop transitive deps.
+
+## Minor
+
+23. **`PolyConfRegistry.resolveClass`** — ✅ **Simplified**. Removed redundant `Try`/`fold`.
+
+24. **`.jvmopts` `-Xmx4G`** vs IntelliJ config `-Xmx8192m` — ❌ Minor inconsistency.
+
+25. **`PolyUtil.waitedGet` / `waitForCondition`** — ✅ **Fixed**. Now throws actual failure cause instead of misleading `TimeoutException`; improved error message for retry-limit exhaustion.

@@ -1,0 +1,104 @@
+# =============================================================================
+# Test arguments config — CliArgGenerator format
+#
+# Classes are auto-discovered via SPI + classpath scanning.
+# Child libraries add runners/generators/transformers by providing a
+# PolyConfProvider in META-INF/services/org.polyconf.core.PolyConfProvider.
+# =============================================================================
+# How to use:
+#
+#   Generate a shell command from a YAML entry:
+#     ./run.sh run.dev.args --yamlPath scripts/testArgs.yaml::shellTest
+#     ./run.sh run.dev.args --yamlPath scripts/testArgs.yaml::transformerPipeline
+#
+#   Pipe directly into bash to execute:
+#     ./run.sh run.dev.args --yamlPath scripts/testArgs.yaml::shellTest | bash
+#
+#   The output is a single 'shell' format command using ./run.sh:
+#     './run.sh run.local' -j '{"CN":"RunnerShell","cmd":"ls /tmp/"}'
+#
+#   Override values (no Renamer needed):
+#     ./run.sh run.dev.args --yamlPath scripts/testArgs.yaml::shellTest \
+#       --renameStr "/tmp/--/Users/"
+#
+#   The Renamer section is optional. When absent, CliArgGenerator creates a
+#   default renamer with empty prefix, so --renameStr replaces literal strings
+#   directly (no $ variable prefix needed).
+#
+#   Use --format all to see all available formats.
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# shellTest — runs a shell command with no Renamer section.
+#   --renameStr replaces literal strings in the generated JSON.
+#
+#     Rename /tmp/ to /Users/:
+#       ./run.sh run.dev.args --yamlPath scripts/testArgs.yaml::shellTest \
+#         --renameStr "/tmp/--/Users/"
+#
+#     Override multiple substrings (~~ separated):
+#       ./run.sh run.dev.args --yamlPath scripts/testArgs.yaml::shellTest \
+#         --renameStr "/tmp/--/Users/~~ls--echo hello"
+# ---------------------------------------------------------------------------
+shellTest:
+  Formatter:
+    CN: RunParamsGenerator
+    shellPrefix: ./run.sh run.local
+    jobStr:
+      CN: RunnerShell
+      cmd: ls /tmp/
+
+# ---------------------------------------------------------------------------
+# transformerPipeline — TransformerJob with env-based variable renaming.
+#
+#   Default (local env):
+#     ./run.sh run.dev.args --yamlPath scripts/testArgs.yaml::transformerPipeline
+#
+#   Select environment (sand, prod, ver):
+#     ./run.sh run.dev.args --yamlPath scripts/testArgs.yaml::transformerPipeline --renameStr Env--prod
+#
+#   Override specific var:
+#     ./run.sh run.dev.args --yamlPath scripts/testArgs.yaml::transformerPipeline --renameStr SCRIPTS_DIR--/custom/path
+#
+# Available envs: local (default), sand, prod, ver
+# ---------------------------------------------------------------------------
+transformerPipeline:
+  Renamer:
+    CN: JsonVariableInline
+    Env:
+      all:
+        OUTPUT_DIR: /tmp/pipeline-output
+      local:
+        SCRIPTS_DIR: scripts
+      sand:
+        SCRIPTS_DIR: /data/sand/polyconf/scripts
+      prod:
+        SCRIPTS_DIR: /data/prod/polyconf/scripts
+      ver:
+        SCRIPTS_DIR: scripts
+        OUTPUT_DIR: /tmp/pipeline-verified
+    defaultEnv: local
+
+  Formatter:
+    CN: RunParamsGenerator
+    shellPrefix: ./run.sh run.local
+    jobStr:
+      CN: TransformerJob
+      generator:
+        CN: SimpleDataGenerator
+        path: $SCRIPTS_DIR/input.csv
+        format: csv
+      transformers:
+        - CN: TransformerDebug
+          columns: [id, name, age]
+        - CN: TransformerDebug
+          sortColumns: [name]
+          sortAsc: true
+          limit: 100
+      writers:
+        - CN: SimpleDataWriter
+          path: $OUTPUT_DIR/output.json
+          format: json
+        - CN: VerifyDataWriter
+          path: $OUTPUT_DIR/output-verify.csv
+          format: csv

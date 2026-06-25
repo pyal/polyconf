@@ -1,0 +1,39 @@
+
+
+fmtTestAddParam:
+  Formatter:
+    CN: RunParamsGenerator
+    shellPrefix: run.local
+    additionalArgs:
+      - -l
+      - {CN: "BBB", xx: "yy"}
+      - --verbose
+      - {nested: {a: 1, b: [x, y]}}
+    jobStr:
+      CN: RunnerShell
+      cmd: $OP $SRC
+
+
+
+fmtTest: # View errors from restSignal job in all envs
+  Renamer:
+    CN: JsonVariableInline
+    Env:
+      all:
+        OP: ls
+      ver:
+        SRC: /tmp/
+      dev:
+        SRC: ~/
+      sand:
+        SRC: ~/
+
+  Formatter:
+    CN: RunParamsGenerator
+    shellPrefix: run.local
+    additionalArgs:
+      - -l
+      - WARN
+    jobStr:
+      CN: RunnerShell
+      cmd: $OP $SRC

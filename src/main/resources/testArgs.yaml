@@ -1,0 +1,48 @@
+shellTest:
+  Formatter:
+    CN: RunParamsGenerator
+    shellPrefix: ./run.sh run.local
+    jobStr:
+      CN: RunnerShell
+      cmd: ls /tmp/
+
+transformerPipeline:
+  Renamer:
+    CN: JsonVariableInline
+    Env:
+      all:
+        OUTPUT_DIR: /tmp/pipeline-output
+      local:
+        SCRIPTS_DIR: scripts
+      sand:
+        SCRIPTS_DIR: /data/sand/polyconf/scripts
+      prod:
+        SCRIPTS_DIR: /data/prod/polyconf/scripts
+      ver:
+        SCRIPTS_DIR: scripts
+        OUTPUT_DIR: /tmp/pipeline-verified
+    defaultEnv: local
+
+  Formatter:
+    CN: RunParamsGenerator
+    shellPrefix: ./run.sh run.local
+    jobStr:
+      CN: TransformerJob
+      generator:
+        CN: SimpleDataGenerator
+        path: $SCRIPTS_DIR/input.csv
+        format: csv
+      transformers:
+        - CN: TransformerDebug
+          columns: [id, name, age]
+        - CN: TransformerDebug
+          sortColumns: [name]
+          sortAsc: true
+          limit: 100
+      writers:
+        - CN: SimpleDataWriter
+          path: $OUTPUT_DIR/output.json
+          format: json
+        - CN: VerifyDataWriter
+          path: $OUTPUT_DIR/output-verify.csv
+          format: csv

@@ -1,0 +1,148 @@
+data: &defaultData
+  - {name: Alice, age: 30, city: NYC, id: 1}
+  - {name: Bob, age: 25, city: LA, id: 2}
+  - {name: Charlie, age: 35, city: Chicago, id: 3}
+  - {name: Diana, age: 28, city: NYC, id: 4}
+  - {name: Eve, age: 32, city: LA, id: 5}
+
+tests:
+  selectColumns:
+    CN: TransformerJob
+    generator:
+      CN: SimpleDataGenerator
+      path: INPUT_PATH
+      format: json
+    transformers:
+      - CN: TransformerDebug
+        columns: [name, age]
+    writers:
+      - CN: VerifyDataWriter
+        path: OUTPUT_PATH
+        format: json
+
+  limitRows:
+    CN: TransformerJob
+    generator:
+      CN: SimpleDataGenerator
+      path: INPUT_PATH
+      format: json
+    transformers:
+      - CN: TransformerDebug
+        limit: 3
+    writers:
+      - CN: VerifyDataWriter
+        path: OUTPUT_PATH
+        format: json
+
+  sortByName:
+    CN: TransformerJob
+    generator:
+      CN: SimpleDataGenerator
+      path: INPUT_PATH
+      format: json
+    transformers:
+      - CN: TransformerDebug
+        sortColumns: [name]
+        sortAsc: true
+    writers:
+      - CN: VerifyDataWriter
+        path: OUTPUT_PATH
+        format: json
+
+  hashFilter:
+    CN: TransformerJob
+    generator:
+      CN: SimpleDataGenerator
+      path: INPUT_PATH
+      format: json
+    transformers:
+      - CN: TransformerDebug
+        hashColumn: name
+        maxHashes: 2
+        givenHash: 0
+    writers:
+      - CN: VerifyDataWriter
+        path: OUTPUT_PATH
+        format: json
+
+  combined:
+    CN: TransformerJob
+    generator:
+      CN: SimpleDataGenerator
+      path: INPUT_PATH
+      format: json
+    transformers:
+      - CN: TransformerDebug
+        columns: [name, age, id]
+        sortColumns: [age]
+        sortAsc: true
+        limit: 3
+    writers:
+      - CN: VerifyDataWriter
+        path: OUTPUT_PATH
+        format: json
+
+  verifyRoundtrip:
+    CN: TransformerJob
+    generator:
+      CN: SimpleDataGenerator
+      path: INPUT_PATH
+      format: json
+    transformers: []
+    writers:
+      - CN: VerifyDataWriter
+        path: OUTPUT_PATH
+        format: json
+
+  csvSplit:
+    CN: TransformerJob
+    generator:
+      CN: SimpleDataGenerator
+      rowsPerFile: 3
+      path: INPUT_PATH
+      format: csv
+    transformers: []
+    writers:
+      - CN: SimpleDataWriter
+        path: OUTPUT_PATH
+        format: json
+
+  csvSortedVerify:
+    CN: TransformerJob
+    generator:
+      CN: SimpleDataGenerator
+      path: SCRIPTS_CSV
+      format: csv
+    transformers:
+      - CN: TransformerDebug
+        columns: [id, name, age]
+      - CN: TransformerDebug
+        sortColumns: [name]
+        sortAsc: true
+        limit: 100
+    writers:
+      - CN: SimpleDataWriter
+        path: OUTPUT_PATH1
+        format: json
+      - CN: VerifyDataWriter
+        path: OUTPUT_PATH2
+        format: csv
+
+  csvMultiWriter:
+    CN: TransformerJob
+    generator:
+      CN: SimpleDataGenerator
+      path: INPUT_PATH
+      format: csv
+    transformers:
+      - CN: TransformerDebug
+        columns: [name, age]
+      - CN: TransformerDebug
+        limit: 100
+    writers:
+      - CN: SimpleDataWriter
+        path: OUTPUT_PATH1
+        format: json
+      - CN: SimpleDataWriter
+        path: OUTPUT_PATH2
+        format: json
