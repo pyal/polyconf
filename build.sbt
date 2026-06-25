@@ -35,8 +35,16 @@ lazy val commonSettings = Seq(
   ),
 )
 
+lazy val publishSettings = Seq(
+  publishTo := Some(
+    "GitHub Packages" at s"https://maven.pkg.github.com/pyal/${name.value}"
+  ),
+  credentials += Credentials(Path.userHome / ".sbt" / ".github-credentials"),
+  publishMavenStyle := true,
+)
+
 lazy val `polyconf` = (project in file("."))
-  .settings(commonSettings, name := "polyconf")
+  .settings(commonSettings, publishSettings, name := "polyconf")
   .settings(
     assembly / mainClass := Some("org.polyconf.argfmt.ArgFormatter"),
     assembly / assemblyMergeStrategy := {
