@@ -41,7 +41,7 @@ lazy val publishSettings = Seq(
   ),
   credentials ++= {
     val envToken = sys.env.get("GITHUB_TOKEN").filter(_.nonEmpty).map { token =>
-      Credentials("GitHub Packages", "maven.pkg.github.com", "pyal", token)
+      Credentials("GitHub Package Registry", "maven.pkg.github.com", "pyal", token)
     }
     val fileCreds = {
       val credFile = Path.userHome / ".sbt" / ".github-credentials"
