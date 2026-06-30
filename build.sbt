@@ -26,11 +26,6 @@ lazy val commonSettings = Seq(
       .exclude("org.slf4j", "slf4j-reload4j")
       .exclude("log4j", "log4j")
       .exclude("ch.qos.reload4j", "reload4j"),
-    ("org.apache.hadoop"                % "hadoop-mapreduce-client-core" % "3.4.3")
-      .exclude("org.slf4j", "slf4j-log4j12")
-      .exclude("org.slf4j", "slf4j-reload4j")
-      .exclude("log4j", "log4j")
-      .exclude("ch.qos.reload4j", "reload4j"),
     "org.scalatest"                   %% "scalatest"           % scalaTestVersion % Test,
   ),
 )
