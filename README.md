@@ -21,6 +21,58 @@ every component is determined at runtime from a JSON or YAML configuration strin
 Instead of hardcoding class instantiation, you declare abstract base traits, register
 all concrete subclasses, and let the config choose which one to use.
 
+## Quick start
+
+### 1. Add the dependency
+
+```sbt
+libraryDependencies += "com.github.pyal" %% "polyconf" % "0.1.0-SNAPSHOT"
+```
+
+### 2. Write your first YAML
+
+Create `jobs.yaml`:
+
+```yaml
+helloWorld:
+  CN: RunnerShell
+  cmd: echo "Hello from polyconf!"
+```
+
+### 3. Run it (via the polyconf CLI)
+
+```bash
+# Clone and build the polyconf project:
+git clone https://github.com/pyal/polyconf.git
+cd polyconf
+sbt assembly
+
+# Generate a CLI command from your YAML and execute it:
+./run.sh run.args --yamlPath jobs.yaml::helloWorld --execute
+```
+
+Or use the library directly from your own project:
+
+```scala
+import org.polyconf.core.PolyConf
+
+val config = """{"CN":"RunnerShell","cmd":"echo 'Hello from polyconf!'"}"""
+val runner = PolyConf.deserializeRunner(config)
+runner.run()
+```
+
+## Next steps
+
+Once you have a working setup, dive deeper:
+
+- **[Core idea: `PolyConf`](#core-idea-polyconf)** — how polymorphic class dispatch works
+- **[Transformers & data pipelines](#transformerjob--configurable-data-pipelines)** — chain generators, transformers, writers in YAML
+- **[`CliArgGenerator`](#cliarggenerator--solving-the-cli-escape-problem)** — environment-specific YAML execution without shell escaping
+- **[`run.sh`](#runsh--cli-entry-point)** — all CLI modes explained
+- **[`test.sh`](#testsh--end-to-end-integration-tests)** — integration testing in YAML
+- **[Spark integration](#spark-integration-for-big-data)** — cloud-scale DataFrames with `polyconf-spark`
+- **[Module structure](#module-structure)** — source tree overview
+
 ## Core idea: `PolyConf`
 
 `PolyConf` is a trait with a `CN` (className) field. When you deserialize a JSON string

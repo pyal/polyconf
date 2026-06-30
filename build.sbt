@@ -1,4 +1,4 @@
-val jacksonVersion = "2.15.2"
+val jacksonVersion = "2.18.8"
 val scala213 = "2.13.16"
 val scalaTestVersion = "3.2.19"
 
@@ -14,19 +14,19 @@ lazy val commonSettings = Seq(
     "com.fasterxml.jackson.core"       % "jackson-annotations" % jacksonVersion,
     "com.fasterxml.jackson.module"    %% "jackson-module-scala" % jacksonVersion,
     "com.fasterxml.jackson.datatype"   % "jackson-datatype-jsr310" % jacksonVersion,
-    "org.apache.logging.log4j"         % "log4j-core"          % "2.20.0",
-    "org.apache.logging.log4j"         % "log4j-1.2-api"       % "2.20.0",
+    "org.apache.logging.log4j"         % "log4j-core"          % "2.25.4",
+    "org.apache.logging.log4j"         % "log4j-1.2-api"       % "2.25.4",
     "org.scala-lang.modules"          %% "scala-parallel-collections" % "1.0.4",
     "org.yaml"                         % "snakeyaml"           % "2.3",
     "org.rogach"                      %% "scallop"             % "5.1.0",
-    "org.apache.avro"                  % "avro"                % "1.11.3",
-    "org.apache.parquet"               % "parquet-avro"        % "1.13.1",
-    ("org.apache.hadoop"                % "hadoop-common"       % "3.3.6")
+    "org.apache.avro"                  % "avro"                % "1.11.5",
+    "org.apache.parquet"               % "parquet-avro"        % "1.15.2",
+    ("org.apache.hadoop"                % "hadoop-common"       % "3.4.3")
       .exclude("org.slf4j", "slf4j-log4j12")
       .exclude("org.slf4j", "slf4j-reload4j")
       .exclude("log4j", "log4j")
       .exclude("ch.qos.reload4j", "reload4j"),
-    ("org.apache.hadoop"                % "hadoop-mapreduce-client-core" % "3.3.6")
+    ("org.apache.hadoop"                % "hadoop-mapreduce-client-core" % "3.4.3")
       .exclude("org.slf4j", "slf4j-log4j12")
       .exclude("org.slf4j", "slf4j-reload4j")
       .exclude("log4j", "log4j")
