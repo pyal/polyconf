@@ -17,6 +17,7 @@ jobs:
           distribution: temurin
           java-version: 17
           cache: sbt
+      - uses: sbt/setup-sbt@v1
       - run: sbt test
 
   publish:
@@ -30,6 +31,7 @@ jobs:
           distribution: temurin
           java-version: 17
           cache: sbt
+      - uses: sbt/setup-sbt@v1
       - run: |
           VERSION=${GITHUB_REF#refs/tags/v}
           sbt 'set version := "'"$VERSION"'"' publish
